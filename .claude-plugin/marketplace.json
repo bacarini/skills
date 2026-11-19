@@ -1,0 +1,7 @@
+{
+  "name": "baca-skills",
+  "owner": { "name": "bacarini" },
+  "plugins": [
+    { "name": "baca-skills", "source": "./", "description": "Personal skills for Baca" }
+  ]
+}
