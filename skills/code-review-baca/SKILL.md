@@ -92,8 +92,12 @@ When `bacarini` already reviewed an older commit `{old}`:
 
 ### 3.4 Draft and check findings
 
+Before drafting, read [`STYLE.md`](STYLE.md) in full: what Baca flags and at what weight, the sentence shapes his comments reuse, and when a PR gets one top-level comment instead of a line-by-line review.
+
 Keep only findings you can justify with a concrete scenario or a rule. Drop speculation. Before submitting, confirm:
 
+- [ ] The approach was weighed before the lines (`STYLE.md` §8 step 1).
+- [ ] Every comment uses a sentence shape from `STYLE.md` §2 and carries a label when it is minor, opinion or naming.
 - [ ] Every finding has a concrete scenario (input or state → what breaks), names the rule it breaks, or quotes the ticket line it misses.
 - [ ] The priorities in §2 were each considered against the diff.
 - [ ] No finding repeats another reviewer's comment or a point resolved in an earlier round.
@@ -102,9 +106,9 @@ Keep only findings you can justify with a concrete scenario or a rule. Drop spec
 
 ## 4. Review states
 
-- **Approve**: no blocking findings. Non-blocking remarks may ride along as inline comments. Body: "LGTM! 🚀" or "LGTM! One edge case 🚀".
-- **Comment**: only questions or non-blocking suggestions where you cannot decide without the author's answer. Body: one line summarizing what you need.
-- **Request changes**: a concrete bug, data-loss or security issue, a broken repo rule that CI will not catch, or a design problem that would be costly to undo after merge. Body: one or two sentences naming the blocking items. Keep the number of blocking items small.
+- **Approve** (the default): the approach is right. The author is trusted to act on the inline comments, however many there are and including must-fix ones, without another round. Body: "LGTM! 🚀" or "LGTM! One edge case 🚀".
+- **Comment**: the approach itself needs rethinking, because it can be much simpler or an existing solution already does the job (`STYLE.md` §4 "Simplify" and "Consistency is key"), but nothing will break production. Body: that one question with the lighter path; no inline comments. Also the state when you cannot decide without the author's answer; the body is then one line saying what you need.
+- **Request changes** (rare): only for something that will definitely break production (`STYLE.md` §4 "Blocking"). Body: one or two sentences naming the blocking items.
 
 When unsure between Approve and Comment, use Comment. When unsure between Comment and Request changes, use Comment.
 
@@ -155,7 +159,7 @@ gh api repos/{owner}/{repo}/pulls/{n}/reviews --input review.json
 ## 6. Do not
 
 - Do not post more than one review per PR per commit.
-- Do not approve when a finding is blocking, and do not request changes for style.
+- Do not approve when a finding will break production, and do not request changes for anything else.
 - Do not comment on code the PR did not touch, unless the PR makes it wrong.
 - Do not paste long code reviews of unchanged files; link the line instead.
 

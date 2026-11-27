@@ -1,18 +1,16 @@
----
-name: "code-review-baca"
-description: "Review a pull request the way Bacarini (@bacarini) reviews, with his voice, priorities and review states. Use when asked to review a PR \"like Bacarini\" or \"as Bacarini\", to draft inline comments and a review summary in his style, or when a review should follow his standards."
----
+# What Baca flags, and how he says it
 
-How to review a pull request the way @bacarini does. Distilled from his review comments,
-summaries and PR conversations across `Bounceapp/bounce`, `bounce-dwh` and friends. Follow it
-literally: the voice, the priorities, and the things that are deliberately _not_ said.
+Distilled from @bacarini's review comments, summaries and PR conversations across
+`Bounceapp/bounce`, `bounce-dwh` and friends. Follow it literally: the voice, the priorities, and
+the things that are deliberately _not_ said.
+
+`SKILL.md` owns the procedure, the review state and the submission. This file owns what to look
+for and how to word it. Where the two disagree, `SKILL.md` wins.
 
 ## 1. Mindset
 
-- Review as a peer who knows the codebase, not as a gatekeeper. Comments never hold someone back
-  from progressing: authors are trusted to act on them, so a PR whose approach is right gets
-  Approve, however many comments it carries. Comment is for an approach that needs rethinking.
-  Request changes is only for something that will definitely break production.
+- Review as a peer who knows the codebase, not as a gatekeeper. Authors are trusted to act on
+  comments without another round.
 - Before reading line by line, weigh the complexity of the approach against its goal and ask: is
   this really needed? For an experiment, a one-off or a first iteration, the question is whether
   each piece serves what's being tested. Sometimes a new screen is the experiment itself; a backend
@@ -102,7 +100,7 @@ as tone rather than decoration. The vocabulary is small; stick to it:
 | 🧹 ✨       | praise for a clean-up                                                     |
 | 👍 ✨ 💯 🚀 | approval / praise                                                         |
 
-Never stack more than two.
+One emoji per comment at most.
 
 **Register.** Start with a capital, usually no trailing full stop on one-liners. Contractions
 everywhere ("it'll", "can't", "I'd"). Abbreviations: "prob.", "def.", "esp.", "qq:", "WDYT",
@@ -121,15 +119,9 @@ Keep it to one line. Typical summaries:
 - `Approving this but my context around this topic is limited 😅`
 - `I'll approve this to keep you unblocked 😄 But …`
 
-Three review states, used deliberately:
-
-- **Approve** (the default): the approach is right. The author is trusted to act on the comments,
-  however many there are, without another round.
-- **Comment**: the approach itself needs rethinking (it can be much simpler, or an existing solution
-  already does the job), but nothing will break production. The author decides and comes back. The
-  summary is the ask, in one line: "Do we need all this complexity for an experiment?", "This
-  solution seems we're just moving the same solution to the backend 😅 Could we …?".
-- **Request changes** (rare): only for something that will definitely break production (§4).
+The review state comes from `SKILL.md` §4. When the approach itself needs rethinking, the summary
+is the ask, in one line: "Do we need all this complexity for an experiment?", "This solution seems
+we're just moving the same solution to the backend 😅 Could we …?".
 
 Defer to the right owner (backend, design, analytics) by @-mention instead of guessing.
 
@@ -140,7 +132,7 @@ separate PR", "Should we open first a PR for 2. only?".
 
 ## 4. What gets flagged, by weight
 
-### Request changes (will definitely break production)
+### Blocking: will definitely break production
 
 - Will break at deploy: a migration and the schema change in the same PR ("We need to run the
   migration in a separate PR from adding the code to `review.ex` otherwise it'll break 😅 … `Poi.query()`
@@ -151,7 +143,7 @@ separate PR", "Should we open first a PR for 2. only?".
 When the approach also needs rethinking (Simplify or Consistency below), the structural change wins:
 submit a Comment, since the rework replaces the code that would break.
 
-### Must fix (unlabelled comment, still Approve)
+### Must fix (unlabelled comment)
 
 - Breaks SEO or crawling: content not server-side rendered, wrong canonical, 404 instead of 410,
   two `h1`s, duplicate DOM for mobile/desktop, experiments served to bots.
@@ -418,19 +410,13 @@ subscription-based partnerships?". They end in `💭` or `WDYT?` and never block
   problem was solved before.
 - Never approve silently when you lack context on the logic; defer to the owner in the summary.
 
-## 8. Checklist for an agent
+## 8. Order of the pass
 
-1. Read the PR description for intent and scope; no Linear link → ask in the summary.
-2. Weigh the approach's complexity against its goal: is each big piece really needed? Backend
-   changes, new models, screens or abstractions that aren't what's being tested → one top-level
-   comment asking about it, with the lighter path (§4 "Simplify"), submitted as a Comment review,
-   and stop there until the author answers.
-3. Consistency: for every new mechanism next to an existing one, read the existing one and search
-   past PRs for the same problem before accepting it (§4 "Consistency is key"). A solution that
-   fits → Comment review naming it, and stop there.
-4. Scope: anything unrelated → "Can we move this to a separate PR?". Migration + schema in one PR,
-   or removed GraphQL fields → Request changes, unless step 2 or 3 already made it a Comment.
-5. Per file, in this order: what can be deleted → nesting/guard clauses → duplication and existing
+1. Approach first: is each big piece really needed (§4 "Simplify"), and does an existing or past
+   solution already do the job (§4 "Consistency is key")? If either fires, the review is one
+   top-level comment and the pass ends here.
+2. Scope: anything unrelated → "Can we move this to a separate PR?".
+3. Per file, in this order: what can be deleted → nesting/guard clauses → duplication and existing
    utilities → naming consistency → magic numbers → component boundaries and types → i18n → tracking
    and experiment exposure → SSR/SEO/perf → tests and stories.
    - Duplication: compare each new JSX block or function with the rest of the file and with the
@@ -439,9 +425,5 @@ subscription-based partnerships?". They end in `💭` or `WDYT?` and never block
      reused safely without polluting the shared code.
    - Stories: for a screen change, list the screen's folder and check a `.stories.tsx` covers each
      new state (each experiment arm included). Tests don't replace stories.
-6. Write each finding as one short question or `I'd …`, with a `suggestion` block when the fix is one
-   line, one emoji at most, a label if it's minor, opinion or naming, and `Same as above` for
-   repeats.
-7. Summarise in one line. Approve when the approach is right, Comment when it needs rethinking,
-   Request changes only when it'll definitely break production. No findings means `LGTM! 🚀` with no
-   inline comments.
+4. Write each finding as one short question or `I'd …`, with a `suggestion` block when the fix is one
+   line, a label if it's minor, opinion or naming, and `Same as above` for repeats.
